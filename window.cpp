@@ -55,7 +55,6 @@ protected:
 
     void makeButton(string s)
     {
-        //     auto dbut = make_managed<Button>();
         auto dbut = new Button();
         dbut->set_margin_top(3);
         dbut->set_margin_bottom(3);
@@ -92,7 +91,7 @@ protected:
         text2.set_hexpand(true);
     }
 
-    void onClicked(Button *but, string sL, string sR) // Button *but)
+    void onClicked(Button *but, string sL, string sR)
     {
         if (but == replacedButton)
         {
