@@ -1,7 +1,7 @@
 # Nerd font search gtk
 
 Simple gtkmm application for searching nerd font icons
-<img src="screenshot.png" align="right" width="200"/>
+<img src="screenshot.png" align="right" height="150"/>
 
 The list of icons is taken [from this page](https://www.nerdfonts.com/cheat-sheet)
 
