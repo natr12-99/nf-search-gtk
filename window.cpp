@@ -1,4 +1,5 @@
 #include <gtkmm.h>
+#include <giomm/settings.h>
 #include "database.cpp"
 
 using namespace Gtk;
@@ -31,20 +32,16 @@ public:
         SpinButton *maxResultsField = new SpinButton();
         maxResultsField->set_range(1, 100);
         maxResultsField->set_increments(1, -1);
-        maxResultsField->set_value(55);
         maxResultsField->signal_changed().connect(sigc::bind(sigc::mem_fun(*this, &MainWindow::OnMaxResultsChanged), maxResultsField));
-        //  butPop->signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::Close));
         Label lbl("Max results");
         popupBox.append(lbl);
         popupBox.append(*maxResultsField);
 
-        CheckButton *exitAfterCopy = new CheckButton("exit after copy");
-        exitAfterCopy->set_active(false);
-        exitAfterCopy->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::ChangeExit));
-        popupBox.append(*exitAfterCopy);
+        CheckButton *exitAfterCopyb = new CheckButton("exit after copy");
+        exitAfterCopyb->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::ChangeExit));
+        popupBox.append(*exitAfterCopyb);
 
         CheckButton *compactMode = new CheckButton("compact");
-        compactMode->set_active(false);
         compactMode->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::ChangeCompact));
         popupBox.append(*compactMode);
 
@@ -62,41 +59,42 @@ public:
         search.signal_search_changed().connect(sigc::mem_fun(*this, &MainWindow::onSearchChanged));
 
         contentBox.set_orientation(Orientation::VERTICAL);
+
+        settings = Gio::Settings::create("org.ntri12.nf-search");
+        maxResultsField->set_value(settings->get_int("max-results"));
+        exitAfterCopyb->set_active(settings->get_boolean("exit-after-copy"));
+        compactMode->set_active(settings->get_boolean("compact"));
     }
 
 protected:
-    /*     void ChangeState(bool *state)
-        {
-            *state = !*state;
-        } */
-
     void ChangeExit()
     {
         exitAfterCopy = !exitAfterCopy;
+        settings->set_boolean("exit-after-copy", exitAfterCopy);
     }
 
     void ChangeCompact()
     {
         if (isCompact)
         {
-            //      clearGrid();
             scWindow.set_child(contentBox);
             isCompact = false;
             onSearchChanged();
         }
         else
         {
-            // clearBox();
             scWindow.set_child(contentGrid);
             isCompact = true;
             onSearchChanged();
         }
+        settings->set_boolean("compact", isCompact);
     }
 
     void OnMaxResultsChanged(SpinButton *sb)
     {
         maxResults = sb->get_value();
         onSearchChanged();
+        settings->set_int("max-results", maxResults);
     }
 
     void onSearchChanged()
@@ -193,13 +191,13 @@ protected:
             return;
         }
 
-        if (replacedButton != nullptr){
+        if (replacedButton != nullptr)
+        {
             if (!isCompact)
-            initButton(replacedButton, prevL, prevR);
-            else 
-            replacedButton->set_label(prevR);
+                initButton(replacedButton, prevL, prevR);
+            else
+                replacedButton->set_label(prevR);
         }
-
 
         prevL = sL;
         prevR = sR;
@@ -227,12 +225,12 @@ protected:
     ScrolledWindow scWindow;
 
     Button *replacedButton = nullptr;
-
     string prevL, prevR;
-    int maxResults = 55;
 
+    int maxResults = 55;
     bool exitAfterCopy = false;
     bool isCompact = false;
+    Glib::RefPtr<Gio::Settings> settings;
 
     int collum = 0;
     int row = 0;

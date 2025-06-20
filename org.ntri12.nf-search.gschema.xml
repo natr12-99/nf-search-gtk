@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.ntri12.nf-search" path="/org/ntri12/nf-search/">
+    <key name="max-results" type="i">
+      <default>53</default>
+    </key>
+    <key name="exit-after-copy" type="b">
+      <default>false</default>
+    </key>
+    <key name="compact" type="b">
+      <default>false</default>
+    </key>
+  </schema>
+</schemalist>
