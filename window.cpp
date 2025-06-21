@@ -12,6 +12,7 @@ public:
         set_title("Nerd font search");
         set_default_size(360, 400);
         set_resizable(false);
+        set_decorated(false);
 
         set_child(mainBox);
         mainBox.set_orientation(Orientation::VERTICAL);
@@ -23,6 +24,13 @@ public:
         search.set_hexpand(true);
         menuButton.set_icon_name("view-more-symbolic");
         menuButton.set_margin(5);
+        Button* closeButton = new Button();
+        topBox.append(*closeButton);
+        closeButton->set_icon_name("window-close-symbolic");
+        closeButton->set_margin(5);
+        closeButton->signal_clicked().connect([this]() {
+            close();
+        });
 
         Popover popover;
         menuButton.set_popover(popover);
@@ -99,7 +107,6 @@ protected:
 
     void onSearchChanged()
     {
-
         string searchText = search.get_text();
 
         int findCount = 0;
@@ -139,10 +146,10 @@ protected:
         else
         {
             dbut->set_label(stringRight);
-            contentGrid.attach(*dbut, collum++, row);
-            if (collum >= 6)
+            contentGrid.attach(*dbut, column++, row);
+            if (column >= 6)
             {
-                collum = 0;
+                column = 0;
                 row++;
             }
         }
@@ -161,7 +168,7 @@ protected:
 
     void clearGrid()
     {
-        collum = 0;
+        column = 0;
         row = 0;
         while (auto child = contentGrid.get_first_child())
         {
@@ -211,7 +218,6 @@ protected:
         replacedButton = but;
         if (exitAfterCopy)
         {
-
             Glib::signal_timeout().connect_once([this]()
                                                 { close(); }, 50);
         }
@@ -232,6 +238,6 @@ protected:
     bool isCompact = false;
     Glib::RefPtr<Gio::Settings> settings;
 
-    int collum = 0;
+    int column = 0;
     int row = 0;
 };
