@@ -211,7 +211,7 @@ private:
         else
             but->set_label("✅");
         get_clipboard()->set_text(sR);
-        replacedButton = but;
+        
         if (exitAfterCopy)
         {
             Glib::signal_timeout().connect_once([this]()
