@@ -24,34 +24,32 @@ public:
         search.set_hexpand(true);
         menuButton.set_icon_name("view-more-symbolic");
         menuButton.set_margin(5);
-        Button* closeButton = new Button();
-        topBox.append(*closeButton);
-        closeButton->set_icon_name("window-close-symbolic");
-        closeButton->set_margin(5);
-        closeButton->signal_clicked().connect([this]() {
-            close();
-        });
+
+        topBox.append(closeButton);
+        closeButton.set_icon_name("window-close-symbolic");
+        closeButton.set_margin(5);
+        closeButton.signal_clicked().connect([this]()
+                                              { close(); });
 
         Popover popover;
         menuButton.set_popover(popover);
 
         Box popupBox(Orientation::VERTICAL);
 
-        SpinButton *maxResultsField = new SpinButton();
-        maxResultsField->set_range(1, 100);
-        maxResultsField->set_increments(1, -1);
-        maxResultsField->signal_changed().connect(sigc::bind(sigc::mem_fun(*this, &MainWindow::OnMaxResultsChanged), maxResultsField));
+        maxResultsField.set_range(1, 100);
+        maxResultsField.set_increments(1, -1);
+        maxResultsField.signal_changed().connect(sigc::bind(sigc::mem_fun(*this, &MainWindow::OnMaxResultsChanged)));
         Label lbl("Max results");
         popupBox.append(lbl);
-        popupBox.append(*maxResultsField);
+        popupBox.append(maxResultsField);
 
-        CheckButton *exitAfterCopyb = new CheckButton("exit after copy");
-        exitAfterCopyb->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::ChangeExit));
-        popupBox.append(*exitAfterCopyb);
+        exitAfterCopyB.set_label("exit after copy");
+        exitAfterCopyB.signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::ChangeExit));
+        popupBox.append(exitAfterCopyB);
 
-        CheckButton *compactMode = new CheckButton("compact");
-        compactMode->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::ChangeCompact));
-        popupBox.append(*compactMode);
+        compactMode.set_label("compact");
+        compactMode.signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::ChangeCompact));
+        popupBox.append(compactMode);
 
         popover.set_child(popupBox);
         mainBox.append(topBox);
@@ -69,12 +67,12 @@ public:
         contentBox.set_orientation(Orientation::VERTICAL);
 
         settings = Gio::Settings::create("org.ntri12.nf-search");
-        maxResultsField->set_value(settings->get_int("max-results"));
-        exitAfterCopyb->set_active(settings->get_boolean("exit-after-copy"));
-        compactMode->set_active(settings->get_boolean("compact"));
+        maxResultsField.set_value(settings->get_int("max-results"));
+        exitAfterCopyB.set_active(settings->get_boolean("exit-after-copy"));
+        compactMode.set_active(settings->get_boolean("compact"));
     }
 
-protected:
+private:
     void ChangeExit()
     {
         exitAfterCopy = !exitAfterCopy;
@@ -98,9 +96,9 @@ protected:
         settings->set_boolean("compact", isCompact);
     }
 
-    void OnMaxResultsChanged(SpinButton *sb)
+    void OnMaxResultsChanged()
     {
-        maxResults = sb->get_value();
+        maxResults = maxResultsField.get_value();
         onSearchChanged();
         settings->set_int("max-results", maxResults);
     }
@@ -131,7 +129,7 @@ protected:
 
     void makeButton(string s)
     {
-        auto dbut = new Button();
+        auto dbut = make_managed<Button>();
         dbut->set_margin_top(3);
         dbut->set_margin_bottom(3);
 
@@ -161,7 +159,6 @@ protected:
         while (auto child = contentBox.get_first_child())
         {
             contentBox.remove(*child);
-            delete child;
             replacedButton = nullptr;
         }
     }
@@ -173,7 +170,6 @@ protected:
         while (auto child = contentGrid.get_first_child())
         {
             contentGrid.remove(*child);
-            delete child;
             replacedButton = nullptr;
         }
     }
@@ -240,4 +236,9 @@ protected:
 
     int column = 0;
     int row = 0;
+
+    Button closeButton;
+    SpinButton maxResultsField;
+    CheckButton exitAfterCopyB;
+    CheckButton compactMode;
 };
